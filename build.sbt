@@ -18,3 +18,13 @@ libraryDependencies ++= Seq(
   "io.spray" %% "spray-json" % sprayJsonVersion,
   "org.slf4j" % "slf4j-simple" % slf4jVersion
 )
+
+lazy val copyJar = taskKey[Unit]("Test copy jar file")
+copyJar := {
+   val folder = new File("target/lib")
+   (managedClasspath in Compile).value.files.foreach { f =>
+     IO.copyFile(f, folder / f.getName)
+   }
+   val jarFile = sbt.Keys.`package`.in(Compile, packageBin).value
+   IO.copyFile(jarFile, new File("target") / jarFile.getName)
+}
